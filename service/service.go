@@ -30,7 +30,13 @@ func (s *Service) PublishCollection(c model.Collection) error {
 	}
 	return s.Store.SaveCollection(c)
 }
-func (s *Service) CopyArticleIDs(ids []string) []string { return ids }
+// CopyArticleIDs returns an independent copy of the article-ID list so that a
+// later edit to the draft (reordering, adding, removing) never rewrites the
+// previous list's contents. Returning the slice directly would alias the
+// caller's backing array and let one business list overwrite another.
+func (s *Service) CopyArticleIDs(ids []string) []string {
+	return append([]string(nil), ids...)
+}
 func (s *Service) BuildHomepage(category string) (model.Homepage, error) {
 	as, e := s.Store.ListArticles(category)
 	if e != nil {
